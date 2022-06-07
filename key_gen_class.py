@@ -32,8 +32,11 @@ class Block:
             return "You have not generate a block. Use the `_.genBlock()` method"
 
     # print the height and word size
-    def blockShape(self, size):
-        print(f"number of columns: {self.height}\nsize of each word: {self.word}")
+    def blockShape(self):
+        try:
+            print(f"number of columns: {self.height}\nsize of each word: {self.word}")
+        except NameError:
+            print("height and word are not defined. Try creating a block first")
 
     # return the number
     # of bits in the block
@@ -50,3 +53,34 @@ class Block:
             self.word = 32
             self.height = self.size // 32 
         self.block = [[0 for i in range(self.word)] for j in range(self.height)]
+
+    # turn a string message
+    # into binary and merge it 
+    # with the block
+    def addMessage(self, msg):
+        # have fun trying to understand
+        # this one...
+        # it turns a list of lists
+        # into a list
+        bin_msg = [j for i in strToBin(msg) for j in i]
+
+        # append the message to the front of the block
+        idx = 0
+        clm = 0
+        while idx < len(bin_msg):
+            if idx % self.word == 0 and idx != 0:
+                clm += 1
+            self.block[clm][idx] = bin_msg[idx]
+            idx += 1
+
+        # append a 1 to the end
+        self.block[clm][idx] = 1
+
+        # append the length of the
+        # message to the end 
+        # of the block
+        length = [i for i in bin(len(msg) * 8)][2:]
+        idx = len(length)
+        while idx > 0:
+            self.block[-1][-idx] = length[len(length)-idx]
+            idx -= 1
